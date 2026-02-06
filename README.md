@@ -93,14 +93,44 @@ uv build --package techconnect-api
 uv build --package techconnect-schemas
 ```
 
-### Linting & Formatting
+### Linting & Formatting (Ruff)
+
+Ruff is used for linting and formatting Python code. It's included in the dev dependencies.
 
 ```bash
-# Lint Python code
+# Install dev dependencies (includes ruff)
+uv sync --all-packages --extra dev
+
+# Check for linting errors
 uv run ruff check packages/schemas packages/api
+
+# Check and auto-fix linting errors
+uv run ruff check --fix packages/schemas packages/api
 
 # Format Python code
 uv run ruff format packages/schemas packages/api
+
+# Check formatting without making changes
+uv run ruff format --check packages/schemas packages/api
+```
+
+### Type Checking (Pyrefly)
+
+Pyrefly is a fast type checker for Python. It's included in the dev dependencies.
+
+```bash
+# Install dev dependencies (includes pyrefly)
+uv sync --all-packages --extra dev
+
+# Type check the schemas package
+uv run --directory packages/schemas pyrefly check .
+
+# Type check the api package
+uv run --directory packages/api pyrefly check .
+
+# Type check from workspace root (run in each package directory)
+cd packages/schemas && uv run pyrefly check . && cd ../..
+cd packages/api && uv run pyrefly check . && cd ../..
 ```
 
 ### Testing
