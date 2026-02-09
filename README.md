@@ -4,7 +4,7 @@ A UV workspace monorepo for the TechConnect biomedical research application api 
 
 ## Structure
 
-```
+```text
 .
 ├── packages/
 │   ├── schemas/      # Python - SQLModel schemas & SQL export
@@ -38,8 +38,11 @@ brew install uv
 # Install all Python dependencies (creates .venv automatically)
 uv sync --all-packages
 
-# Run backend development server
-uv run --package techconnect-api uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+# Run backend development server (from workspace root)
+uv run --package techconnect-api fastapi dev packages/api/app/main.py
+
+# Or run from the package directory
+cd packages/api && uv run fastapi dev app/main.py
 
 # Export SQL schema
 uv run --package techconnect-schemas export-schema --dialect postgresql
@@ -61,7 +64,17 @@ uv sync --package techconnect-schemas
 ### Development
 
 ```bash
-# Run FastAPI backend
+# Run FastAPI backend (development mode with auto-reload)
+uv run --package techconnect-api fastapi dev packages/api/app/main.py
+
+# Or from the package directory (simpler)
+cd packages/api
+uv run fastapi dev app/main.py
+
+# Production mode
+uv run --package techconnect-api fastapi run packages/api/app/main.py
+
+# Using uvicorn directly (alternative)
 uv run --package techconnect-api uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 # Backend will be available at:
@@ -159,8 +172,12 @@ uv run --package techconnect-schemas export-schema --dialect postgresql
 FastAPI API that uses the schemas package.
 
 ```bash
-# Start development server
-uv run --package techconnect-api uvicorn app.main:app --reload
+# Start development server (with auto-reload)
+cd packages/api
+uv run fastapi dev app/main.py
+
+# Or from workspace root
+uv run --package techconnect-api fastapi dev packages/api/app/main.py
 ```
 
 ## Frontend
@@ -186,8 +203,10 @@ pnpm dev
 1. Create the package directory: `packages/my-package/`
 2. Add a `pyproject.toml` with the package metadata
 3. Update the root `pyproject.toml` to include it in members:
+
    ```toml
    [tool.uv.workspace]
    members = ["packages/api", "packages/schemas", "packages/my-package"]
    ```
+
 4. Run `uv sync --all-packages`
