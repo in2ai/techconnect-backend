@@ -17,6 +17,9 @@ dev = [
     "pyrefly>=0.51.0",
 ]
 
+[project.scripts]
+seed-db = "app.seed:main"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

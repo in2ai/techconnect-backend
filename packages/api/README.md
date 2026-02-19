@@ -59,6 +59,12 @@ uv run pytest -v
 uv run pytest --cov
 ```
 
+### Seed Sample Data
+
+```bash
+uv run --package techconnect-api seed-db
+```
+
 ### Linting & Formatting
 
 ```bash
