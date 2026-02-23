@@ -1,0 +1,7 @@
+BIOPSIA LIQUIDA pasa a muestra -> añadir tiene tejido tumoral, tiene tejido no tumoral. La fecha será fecha obtención
+
+Mantener relaciones con DatosMoleculares y secuenciación genomica (id, presenta o no, campo de texto)
+
+Un tumor puede generar hasta 3 biomodelos
+
+Biomodelo -> ensayoPreclinico (texto libre, admite nulos, reunión semana que viene)
