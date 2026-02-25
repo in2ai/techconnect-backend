@@ -176,24 +176,21 @@ interface NavItem {
 export class AppShellComponent {
   private breakpoint = inject(BreakpointObserver);
 
-  isMobile = toSignal(
-    this.breakpoint.observe([Breakpoints.Handset]).pipe(map((r) => r.matches)),
-    { initialValue: false },
-  );
+  isMobile = toSignal(this.breakpoint.observe([Breakpoints.Handset]).pipe(map((r) => r.matches)), {
+    initialValue: false,
+  });
 
   navGroups = [
     {
       title: 'Overview',
-      items: [
-        { label: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
-      ],
+      items: [{ label: 'Dashboard', icon: 'dashboard', route: '/dashboard' }],
     },
     {
       title: 'Registry',
       items: [
         { label: 'Patients', icon: 'person', route: '/patients' },
         { label: 'Tumors', icon: 'coronavirus', route: '/tumors' },
-        { label: 'Liquid Biopsies', icon: 'water_drop', route: '/liquid-biopsies' },
+        { label: 'Samples', icon: 'water_drop', route: '/samples' },
       ],
     },
     {

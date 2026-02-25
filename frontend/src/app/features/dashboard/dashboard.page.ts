@@ -25,8 +25,8 @@ interface DashboardCard {
       <div class="hero-content">
         <h1 class="hero-title">Welcome to TechConnect</h1>
         <p class="hero-subtitle">
-          Biomedical research data management platform. Navigate through your registry,
-          biomodels, and clinical trial data.
+          Biomedical research data management platform. Navigate through your registry, biomodels,
+          and clinical trial data.
         </p>
       </div>
     </div>
@@ -37,14 +37,20 @@ interface DashboardCard {
           <mat-card class="entity-card" appearance="outlined">
             <mat-card-content>
               <div class="card-header">
-                <div class="card-icon-wrap" [style.background]="card.color + '18'" [style.color]="card.color">
+                <div
+                  class="card-icon-wrap"
+                  [style.background]="card.color + '18'"
+                  [style.color]="card.color"
+                >
                   <mat-icon>{{ card.icon }}</mat-icon>
                 </div>
                 <div class="card-count">
                   @if (getResource(card.endpoint).isLoading()) {
                     <mat-spinner diameter="20" aria-label="Loading count"></mat-spinner>
                   } @else if (getResource(card.endpoint).error()) {
-                    <mat-icon class="count-error-icon" aria-label="Error loading data">error_outline</mat-icon>
+                    <mat-icon class="count-error-icon" aria-label="Error loading data"
+                      >error_outline</mat-icon
+                    >
                   } @else if (getResource(card.endpoint).hasValue()) {
                     {{ getResource(card.endpoint).value()!.length }}
                   } @else {
@@ -64,7 +70,11 @@ interface DashboardCard {
     .dashboard-hero {
       margin-bottom: 2rem;
       padding: 2.5rem 2rem;
-      background: linear-gradient(135deg, var(--mat-sys-primary-container), var(--mat-sys-tertiary-container));
+      background: linear-gradient(
+        135deg,
+        var(--mat-sys-primary-container),
+        var(--mat-sys-tertiary-container)
+      );
       border-radius: 16px;
     }
 
@@ -99,7 +109,9 @@ interface DashboardCard {
 
     .entity-card {
       height: 100%;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
       cursor: pointer;
       border-radius: 12px !important;
 
@@ -173,12 +185,54 @@ export class DashboardPage {
   private apiUrl = inject(API_URL);
 
   cards: DashboardCard[] = [
-    { title: 'Patients', icon: 'person', route: '/patients', endpoint: 'patients', color: '#2563eb', description: 'View and manage patient records and demographics.' },
-    { title: 'Tumors', icon: 'coronavirus', route: '/tumors', endpoint: 'tumors', color: '#dc2626', description: 'Track tumor samples, classifications, and biobank codes.' },
-    { title: 'Liquid Biopsies', icon: 'water_drop', route: '/liquid-biopsies', endpoint: 'liquid-biopsies', color: '#0891b2', description: 'Manage serum, buffy coat, and plasma samples.' },
-    { title: 'Biomodels', icon: 'science', route: '/biomodels', endpoint: 'biomodels', color: '#7c3aed', description: 'Preclinical biomodels derived from tumor samples.' },
-    { title: 'Passages', icon: 'swap_horiz', route: '/passages', endpoint: 'passages', color: '#059669', description: 'Track biomodel passages, viability, and growth indices.' },
-    { title: 'Trials', icon: 'assignment', route: '/trials', endpoint: 'trials', color: '#d97706', description: 'PDX, PDO, and LC trial data with detailed outcomes.' },
+    {
+      title: 'Patients',
+      icon: 'person',
+      route: '/patients',
+      endpoint: 'patients',
+      color: '#2563eb',
+      description: 'View and manage patient records and demographics.',
+    },
+    {
+      title: 'Tumors',
+      icon: 'coronavirus',
+      route: '/tumors',
+      endpoint: 'tumors',
+      color: '#dc2626',
+      description: 'Track tumor samples, classifications, and biobank codes.',
+    },
+    {
+      title: 'Samples',
+      icon: 'water_drop',
+      route: '/samples',
+      endpoint: 'samples',
+      color: '#0891b2',
+      description: 'Manage serum, buffy coat, and plasma samples.',
+    },
+    {
+      title: 'Biomodels',
+      icon: 'science',
+      route: '/biomodels',
+      endpoint: 'biomodels',
+      color: '#7c3aed',
+      description: 'Preclinical biomodels derived from tumor samples.',
+    },
+    {
+      title: 'Passages',
+      icon: 'swap_horiz',
+      route: '/passages',
+      endpoint: 'passages',
+      color: '#059669',
+      description: 'Track biomodel passages, viability, and growth indices.',
+    },
+    {
+      title: 'Trials',
+      icon: 'assignment',
+      route: '/trials',
+      endpoint: 'trials',
+      color: '#d97706',
+      description: 'PDX, PDO, and LC trial data with detailed outcomes.',
+    },
   ];
 
   private resources = new Map<string, ReturnType<typeof httpResource<unknown[]>>>();

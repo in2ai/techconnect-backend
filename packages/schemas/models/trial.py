@@ -11,15 +11,16 @@ from uuid import UUID, uuid4
 from sqlmodel import Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
+    from .biomodel import Biomodel
     from .passage import Passage
-    from .pdx_entities import Implant, Mouse
+    from .pdx_entities import Mouse
     from .lc_entities import FACS
     from .trial_entities import (
         UsageRecord,
         Image,
         Cryopreservation,
-        GenomicSequencing,
-        MolecularData,
+        TrialGenomicSequencing,
+        TrialMolecularData,
     )
 
 
@@ -31,6 +32,8 @@ class Trial(SQLModel, table=True):
         id: Unique identifier (UUID)
         success: Whether the trial was successful
         description: General description
+        status: Status of the trial
+        preclinical_trials: Preclinical trials information
         creation_date: Date the trial was created
         biobank_shipment: Whether there was a biobank shipment
         biobank_arrival_date: Date of biobank arrival
@@ -45,6 +48,8 @@ class Trial(SQLModel, table=True):
     # Fields
     success: Optional[bool] = Field(default=None)
     description: Optional[str] = Field(default=None)  # text field
+    status: Optional[bool] = Field(default=None)
+    preclinical_trials: Optional[str] = Field(default=None)
     creation_date: Union[date, None] = Field(default=None)
     biobank_shipment: Optional[bool] = Field(default=None)
     biobank_arrival_date: Union[date, None] = Field(default=None)
@@ -53,12 +58,20 @@ class Trial(SQLModel, table=True):
     passage_id: UUID = Field(foreign_key="passage.id", description="FK to Passage")
     
     # Relationships
-    passage: Optional["Passage"] = Relationship(back_populates="trials")
+    passage: Optional["Passage"] = Relationship(
+        back_populates="trials",
+        sa_relationship_kwargs={"foreign_keys": "[Trial.passage_id]"}
+    )
     usage_records: list["UsageRecord"] = Relationship(back_populates="trial")
     images: list["Image"] = Relationship(back_populates="trial")
     cryopreservations: list["Cryopreservation"] = Relationship(back_populates="trial")
-    genomic_sequencing: Optional["GenomicSequencing"] = Relationship(back_populates="trial")
-    molecular_data: Optional["MolecularData"] = Relationship(back_populates="trial")
+    genomic_sequencing: Optional["TrialGenomicSequencing"] = Relationship(back_populates="trial")
+    molecular_data: Optional["TrialMolecularData"] = Relationship(back_populates="trial")
+    child_biomodels: list["Biomodel"] = Relationship(back_populates="parent_trial")
+    child_passages: list["Passage"] = Relationship(
+        back_populates="parent_trial",
+        sa_relationship_kwargs={"foreign_keys": "[Passage.parent_trial_id]"}
+    )
     
     # Subtype relationships (1:1 for inheritance pattern)
     pdx_trial: Optional["PDXTrial"] = Relationship(back_populates="trial")
@@ -75,9 +88,9 @@ class PDXTrial(SQLModel, table=True):
         ffpe: Formalin-fixed paraffin-embedded
         he_slide: H&E slide available
         ihq_data: Immunohistochemistry data
+        has_ihq_data: Has immunohistochemistry data
         latency_weeks: Latency period in weeks
-        s_index: S-index value
-        scanner_magnification: Scanner magnification used
+        similarity: Similarity value
     """
     
     __tablename__ = "pdx_trial"
@@ -89,13 +102,12 @@ class PDXTrial(SQLModel, table=True):
     ffpe: Optional[bool] = Field(default=None)
     he_slide: Optional[bool] = Field(default=None)
     ihq_data: Optional[str] = Field(default=None)  # text field
-    latency_weeks: Optional[int] = Field(default=None)
-    s_index: Optional[float] = Field(default=None)
-    scanner_magnification: Optional[str] = Field(default=None, max_length=50)
+    has_ihq_data: Optional[bool] = Field(default=None)
+    latency_weeks: Optional[float] = Field(default=None)
+    similarity: Optional[float] = Field(default=None)
     
     # Relationships
     trial: Optional["Trial"] = Relationship(back_populates="pdx_trial")
-    implants: list["Implant"] = Relationship(back_populates="pdx_trial")
     mouse: Optional["Mouse"] = Relationship(back_populates="pdx_trial")
 
 
@@ -109,7 +121,6 @@ class PDOTrial(SQLModel, table=True):
         frozen_organoid_count: Number of frozen organoids
         organoid_count: Total organoid count
         plate_type: Type of plate used
-        visualization_day: Day of visualization
         assessment: Assessment result
     """
     
@@ -123,7 +134,6 @@ class PDOTrial(SQLModel, table=True):
     frozen_organoid_count: Optional[int] = Field(default=None)
     organoid_count: Optional[int] = Field(default=None)
     plate_type: Optional[str] = Field(default=None, max_length=50)
-    visualization_day: Optional[int] = Field(default=None)
     assessment: Optional[str] = Field(default=None, max_length=100)
     
     # Relationships
@@ -139,7 +149,6 @@ class LCTrial(SQLModel, table=True):
         confluence: Confluence percentage
         spheroids: Whether spheroids are present
         digestion_date: Date of digestion
-        cell_line: Cell line identifier
         plate_type: Type of plate used
     """
     
@@ -152,7 +161,6 @@ class LCTrial(SQLModel, table=True):
     confluence: Optional[float] = Field(default=None)
     spheroids: Optional[bool] = Field(default=None)
     digestion_date: Union[date, None] = Field(default=None)
-    cell_line: Optional[str] = Field(default=None, max_length=100)
     plate_type: Optional[str] = Field(default=None, max_length=50)
     
     # Relationships

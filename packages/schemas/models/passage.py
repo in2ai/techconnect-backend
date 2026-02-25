@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Optional
 from uuid import UUID, uuid4
 
 from sqlmodel import Field, Relationship, SQLModel
+from sqlalchemy import ForeignKey
 
 if TYPE_CHECKING:
     from .biomodel import Biomodel
@@ -17,9 +18,6 @@ class Passage(SQLModel, table=True):
     Attributes:
         id: Unique identifier (UUID)
         number: Passage number
-        status: Current status
-        s_index: S-index value
-        viability: Viability percentage
         description: General description
         biomodel_id: FK to Biomodel
     """
@@ -31,14 +29,24 @@ class Passage(SQLModel, table=True):
     
     # Fields
     number: Optional[int] = Field(default=None)
-    status: Optional[str] = Field(default=None, max_length=50)
-    s_index: Optional[float] = Field(default=None)
-    viability: Optional[float] = Field(default=None)
     description: Optional[str] = Field(default=None)  # text field
     
     # Foreign keys (required - 1:0..2 relationship with Biomodel)
     biomodel_id: UUID = Field(foreign_key="biomodel.id", description="FK to Biomodel")
     
+    parent_trial_id: Optional[UUID] = Field(
+        default=None,
+        sa_column_args=[ForeignKey("trial.id", name="fk_passage_parent_trial_id", use_alter=True)],
+        description="FK to parent Trial"
+    )
+    
     # Relationships
     biomodel: Optional["Biomodel"] = Relationship(back_populates="passages")
-    trials: list["Trial"] = Relationship(back_populates="passage")
+    trials: list["Trial"] = Relationship(
+        back_populates="passage",
+        sa_relationship_kwargs={"foreign_keys": "[Trial.passage_id]"}
+    )
+    parent_trial: Optional["Trial"] = Relationship(
+        back_populates="child_passages",
+        sa_relationship_kwargs={"foreign_keys": "[Passage.parent_trial_id]"}
+    )

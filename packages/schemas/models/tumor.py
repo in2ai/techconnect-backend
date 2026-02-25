@@ -3,11 +3,12 @@
 from datetime import date
 from typing import TYPE_CHECKING, Optional, Union
 
+from uuid import UUID, uuid4
 from sqlmodel import Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
     from .patient import Patient
-    from .liquid_biopsy import LiquidBiopsy
+    from .sample import Sample
     from .biomodel import Biomodel
 
 
@@ -50,5 +51,49 @@ class Tumor(SQLModel, table=True):
     
     # Relationships
     patient: Optional["Patient"] = Relationship(back_populates="tumors")
-    liquid_biopsies: list["LiquidBiopsy"] = Relationship(back_populates="tumor")
+    samples: list["Sample"] = Relationship(back_populates="tumor")
     biomodels: list["Biomodel"] = Relationship(back_populates="tumor")
+    genomic_sequencing: Optional["TumorGenomicSequencing"] = Relationship(back_populates="tumor")
+    molecular_data: Optional["TumorMolecularData"] = Relationship(back_populates="tumor")
+
+
+class TumorGenomicSequencing(SQLModel, table=True):
+    """
+    TumorGenomicSequencing entity - genomic sequencing data associated with a tumor.
+    """
+    
+    __tablename__ = "tumor_genomic_sequencing"
+    
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    has_data: Optional[bool] = Field(default=None)
+    data: Optional[str] = Field(default=None)
+    
+    tumor_biobank_code: Optional[str] = Field(
+        default=None,
+        foreign_key="tumor.biobank_code",
+        unique=True,
+        description="FK to Tumor"
+    )
+    
+    tumor: Optional["Tumor"] = Relationship(back_populates="genomic_sequencing")
+
+
+class TumorMolecularData(SQLModel, table=True):
+    """
+    TumorMolecularData entity - molecular data associated with a tumor.
+    """
+    
+    __tablename__ = "tumor_molecular_data"
+    
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    has_data: Optional[bool] = Field(default=None)
+    data: Optional[str] = Field(default=None)
+    
+    tumor_biobank_code: Optional[str] = Field(
+        default=None,
+        foreign_key="tumor.biobank_code",
+        unique=True,
+        description="FK to Tumor"
+    )
+    
+    tumor: Optional["Tumor"] = Relationship(back_populates="molecular_data")

@@ -7,40 +7,62 @@ import { httpResource } from '@angular/common/http';
 import { filter, switchMap, tap, catchError, take, EMPTY } from 'rxjs';
 import { API_URL } from '../../../../core/tokens/api-url.token';
 import { NotificationService } from '../../../../core/services/notification.service';
-import { LiquidBiopsyService } from '../../services/liquid-biopsy.service';
-import { LiquidBiopsy } from '../../models/liquid-biopsy.model';
+import { SampleService } from '../../services/sample.service';
+import { Sample } from '../../models/sample.model';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
-import { DataTableComponent, ColumnDef } from '../../../../shared/components/data-table/data-table.component';
+import {
+  DataTableComponent,
+  ColumnDef,
+} from '../../../../shared/components/data-table/data-table.component';
 import { LoadingStateComponent } from '../../../../shared/components/loading-state/loading-state.component';
-import { LiquidBiopsyFormComponent } from '../../components/liquid-biopsy-form/liquid-biopsy-form.component';
+import { SampleFormComponent } from '../../components/sample-form/sample-form.component';
 
 @Component({
-  selector: 'app-liquid-biopsy-list',
+  selector: 'app-sample-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MatButtonModule, MatIconModule, PageHeaderComponent, DataTableComponent, LoadingStateComponent],
+  imports: [
+    MatButtonModule,
+    MatIconModule,
+    PageHeaderComponent,
+    DataTableComponent,
+    LoadingStateComponent,
+  ],
   template: `
-    <app-page-header title="Liquid Biopsies" subtitle="Serum, buffy coat, and plasma samples from tumors">
+    <app-page-header title="Samples" subtitle="Serum, buffy coat, and plasma samples from tumors">
       <button mat-flat-button (click)="openCreateDialog()">
         <mat-icon>add</mat-icon>
-        Add Liquid Biopsy
+        Add Sample
       </button>
     </app-page-header>
 
     @if (resource.isLoading()) {
       <app-loading-state status="loading" />
     } @else if (resource.error()) {
-      <app-loading-state status="error" errorMessage="Failed to load liquid biopsies" (retry)="resource.reload()" />
+      <app-loading-state
+        status="error"
+        errorMessage="Failed to load samples"
+        (retry)="resource.reload()"
+      />
     } @else if (resource.hasValue() && resource.value()!.length === 0) {
-      <app-loading-state status="empty" emptyIcon="bloodtype" emptyTitle="No liquid biopsies yet" emptyMessage="Create your first liquid biopsy record." />
+      <app-loading-state
+        status="empty"
+        emptyIcon="bloodtype"
+        emptyTitle="No samples yet"
+        emptyMessage="Create your first sample record."
+      />
     } @else if (resource.hasValue()) {
-      <app-data-table [columns]="columns" [data]="resource.value()!" (rowClicked)="onRowClick($event)" />
+      <app-data-table
+        [columns]="columns"
+        [data]="resource.value()!"
+        (rowClicked)="onRowClick($event)"
+      />
     }
   `,
 })
-export class LiquidBiopsyListPage {
+export class SampleListPage {
   private router = inject(Router);
   private dialog = inject(MatDialog);
-  private service = inject(LiquidBiopsyService);
+  private service = inject(SampleService);
   private notification = inject(NotificationService);
   private apiUrl = inject(API_URL);
 
@@ -53,26 +75,26 @@ export class LiquidBiopsyListPage {
     { key: 'tumor_biobank_code', label: 'Tumor', sortable: true },
   ];
 
-  resource = httpResource<LiquidBiopsy[]>(() => `${this.apiUrl}/liquid-biopsies`, { defaultValue: [] });
+  resource = httpResource<Sample[]>(() => `${this.apiUrl}/samples`, { defaultValue: [] });
 
-  onRowClick(biopsy: LiquidBiopsy): void {
-    this.router.navigate(['/liquid-biopsies', biopsy.id]);
+  onRowClick(biopsy: Sample): void {
+    this.router.navigate(['/samples', biopsy.id]);
   }
 
   openCreateDialog(): void {
     this.dialog
-      .open(LiquidBiopsyFormComponent, { width: '500px', data: { mode: 'create' } })
+      .open(SampleFormComponent, { width: '500px', data: { mode: 'create' } })
       .afterClosed()
       .pipe(
         take(1),
-        filter((result): result is LiquidBiopsy => !!result),
+        filter((result): result is Sample => !!result),
         switchMap((result) => this.service.create(result)),
         tap(() => {
-          this.notification.success('Liquid biopsy created');
+          this.notification.success('Sample created');
           this.resource.reload();
         }),
         catchError(() => {
-          this.notification.error('Failed to create liquid biopsy');
+          this.notification.error('Failed to create sample');
           return EMPTY;
         }),
       )

@@ -62,14 +62,14 @@ export const routes: Routes = [
       import('./features/trials/pages/trial-detail/trial-detail.page').then((m) => m.TrialDetailPage),
   },
   {
-    path: 'liquid-biopsies',
+    path: 'samples',
     loadComponent: () =>
-      import('./features/liquid-biopsies/pages/liquid-biopsy-list/liquid-biopsy-list.page').then((m) => m.LiquidBiopsyListPage),
+      import('./features/samples/pages/sample-list/sample-list.page').then((m) => m.SampleListPage),
   },
   {
-    path: 'liquid-biopsies/:id',
+    path: 'samples/:id',
     loadComponent: () =>
-      import('./features/liquid-biopsies/pages/liquid-biopsy-detail/liquid-biopsy-detail.page').then((m) => m.LiquidBiopsyDetailPage),
+      import('./features/samples/pages/sample-detail/sample-detail.page').then((m) => m.SampleDetailPage),
   },
   {
     path: '**',

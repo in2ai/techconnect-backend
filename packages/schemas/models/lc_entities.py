@@ -15,6 +15,8 @@ class FACS(SQLModel, table=True):
     
     Attributes:
         id: Unique identifier (UUID)
+        measure: Measure string
+        measure_value: Value of the measure
         lc_trial_id: FK to LCTrial (optional - 1:0..1 relationship)
     """
     
@@ -22,6 +24,10 @@ class FACS(SQLModel, table=True):
     
     # Primary key
     id: UUID = Field(default_factory=uuid4, primary_key=True)
+    
+    # Fields
+    measure: Optional[str] = Field(default=None, max_length=100)
+    measure_value: Optional[float] = Field(default=None)
     
     # Foreign keys (optional - 1:0..1 relationship with LCTrial)
     lc_trial_id: Optional[UUID] = Field(

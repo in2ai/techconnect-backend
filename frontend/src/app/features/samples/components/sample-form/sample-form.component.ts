@@ -5,24 +5,36 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
-import { LiquidBiopsy } from '../../models/liquid-biopsy.model';
+import { Sample } from '../../models/sample.model';
 
-export interface LiquidBiopsyFormData {
+export interface SampleFormData {
   mode: 'create' | 'edit';
-  biopsy?: LiquidBiopsy;
+  biopsy?: Sample;
 }
 
 @Component({
-  selector: 'app-liquid-biopsy-form',
+  selector: 'app-sample-form',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MatDialogModule, MatButtonModule, MatInputModule, MatFormFieldModule, MatCheckboxModule, FormsModule],
+  imports: [
+    MatDialogModule,
+    MatButtonModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatCheckboxModule,
+    FormsModule,
+  ],
   template: `
-    <h2 mat-dialog-title>{{ data.mode === 'create' ? 'New Liquid Biopsy' : 'Edit Liquid Biopsy' }}</h2>
+    <h2 mat-dialog-title>{{ data.mode === 'create' ? 'New Sample' : 'Edit Sample' }}</h2>
     <mat-dialog-content>
       <form class="form-grid">
         <mat-form-field appearance="outline">
           <mat-label>Tumor Biobank Code</mat-label>
-          <input matInput [(ngModel)]="model.tumor_biobank_code" name="tumor_biobank_code" required />
+          <input
+            matInput
+            [(ngModel)]="model.tumor_biobank_code"
+            name="tumor_biobank_code"
+            required
+          />
         </mat-form-field>
         <mat-form-field appearance="outline">
           <mat-label>Biopsy Date</mat-label>
@@ -43,14 +55,31 @@ export interface LiquidBiopsyFormData {
     </mat-dialog-actions>
   `,
   styles: `
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; min-width: 360px; }
-    .checkbox-group { grid-column: 1 / -1; display: flex; gap: 1.5rem; padding: 0.5rem 0; }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      min-width: 360px;
+    }
+    .checkbox-group {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 1.5rem;
+      padding: 0.5rem 0;
+    }
   `,
 })
-export class LiquidBiopsyFormComponent {
-  data = inject<LiquidBiopsyFormData>(MAT_DIALOG_DATA);
+export class SampleFormComponent {
+  data = inject<SampleFormData>(MAT_DIALOG_DATA);
 
-  model: LiquidBiopsy = this.data.biopsy
+  model: Sample = this.data.biopsy
     ? { ...this.data.biopsy }
-    : { id: '', has_serum: null, has_buffy: null, has_plasma: null, biopsy_date: null, tumor_biobank_code: '' };
+    : {
+        id: '',
+        has_serum: null,
+        has_buffy: null,
+        has_plasma: null,
+        biopsy_date: null,
+        tumor_biobank_code: '',
+      };
 }

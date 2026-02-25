@@ -1,4 +1,4 @@
-"""LiquidBiopsy model - Entity representing a liquid biopsy sample."""
+"""Sample model - Entity representing a liquid biopsy sample."""
 
 from datetime import date
 from typing import TYPE_CHECKING, Optional, Union
@@ -10,9 +10,9 @@ if TYPE_CHECKING:
     from .tumor import Tumor
 
 
-class LiquidBiopsy(SQLModel, table=True):
+class Sample(SQLModel, table=True):
     """
-    LiquidBiopsy entity representing a liquid biopsy sample.
+    Sample entity representing a liquid biopsy sample.
     
     Attributes:
         id: Unique identifier (UUID)
@@ -23,7 +23,7 @@ class LiquidBiopsy(SQLModel, table=True):
         biopsy_date: Date of the biopsy
     """
     
-    __tablename__ = "liquid_biopsy"
+    __tablename__ = "sample"
     
     # Primary key
     id: UUID = Field(default_factory=uuid4, primary_key=True)
@@ -42,4 +42,4 @@ class LiquidBiopsy(SQLModel, table=True):
     )
     
     # Relationships
-    tumor: Optional["Tumor"] = Relationship(back_populates="liquid_biopsies")
+    tumor: Optional["Tumor"] = Relationship(back_populates="samples")

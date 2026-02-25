@@ -2,6 +2,8 @@ export interface Trial {
   id: string;
   success: boolean | null;
   description: string | null;
+  status: boolean | null;
+  preclinical_trials: string | null;
   creation_date: string | null;
   biobank_shipment: boolean | null;
   biobank_arrival_date: string | null;
@@ -13,9 +15,9 @@ export interface PDXTrial {
   ffpe: boolean | null;
   he_slide: boolean | null;
   ihq_data: string | null;
+  has_ihq_data: boolean | null;
   latency_weeks: number | null;
-  s_index: number | null;
-  scanner_magnification: string | null;
+  similarity: number | null;
 }
 
 export interface PDOTrial {
@@ -24,7 +26,6 @@ export interface PDOTrial {
   frozen_organoid_count: number | null;
   organoid_count: number | null;
   plate_type: string | null;
-  visualization_day: number | null;
   assessment: string | null;
 }
 
@@ -33,6 +34,5 @@ export interface LCTrial {
   confluence: number | null;
   spheroids: boolean | null;
   digestion_date: string | null;
-  cell_line: string | null;
   plate_type: string | null;
 }

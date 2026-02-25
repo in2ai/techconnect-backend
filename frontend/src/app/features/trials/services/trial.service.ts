@@ -3,14 +3,14 @@ import { BaseCrudService } from '../../../core/services/base-crud.service';
 import { Trial, PDXTrial, PDOTrial, LCTrial } from '../models/trial.model';
 import {
   Implant,
-  SizeRecord,
+  Measure,
   Mouse,
   FACS,
   UsageRecord,
   TrialImage,
   Cryopreservation,
-  GenomicSequencing,
-  MolecularData,
+  TrialGenomicSequencing,
+  TrialMolecularData,
 } from '../models/trial-related.model';
 
 @Injectable({ providedIn: 'root' })
@@ -39,8 +39,8 @@ export class ImplantService extends BaseCrudService<Implant> {
 }
 
 @Injectable({ providedIn: 'root' })
-export class SizeRecordService extends BaseCrudService<SizeRecord> {
-  protected endpoint = 'size-records';
+export class MeasureService extends BaseCrudService<Measure> {
+  protected endpoint = 'measures';
 }
 
 @Injectable({ providedIn: 'root' })
@@ -69,11 +69,11 @@ export class CryopreservationService extends BaseCrudService<Cryopreservation> {
 }
 
 @Injectable({ providedIn: 'root' })
-export class GenomicSequencingService extends BaseCrudService<GenomicSequencing> {
-  protected endpoint = 'genomic-sequencings';
+export class TrialGenomicSequencingService extends BaseCrudService<TrialGenomicSequencing> {
+  protected endpoint = 'trial-genomic-sequencings';
 }
 
 @Injectable({ providedIn: 'root' })
-export class MolecularDataService extends BaseCrudService<MolecularData> {
-  protected endpoint = 'molecular-data';
+export class TrialMolecularDataService extends BaseCrudService<TrialMolecularData> {
+  protected endpoint = 'trial-molecular-data';
 }

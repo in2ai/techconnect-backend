@@ -13,21 +13,23 @@ from models import (
     FACS,
     Biomodel,
     Cryopreservation,
-    GenomicSequencing,
     Image,
     Implant,
     LCTrial,
-    LiquidBiopsy,
-    MolecularData,
     Mouse,
     Passage,
     Patient,
     PDOTrial,
     PDXTrial,
-    SizeRecord,
+    Sample,
     Trial,
     Tumor,
     UsageRecord,
+    Measure,
+    TrialGenomicSequencing,
+    TrialMolecularData,
+    TumorGenomicSequencing,
+    TumorMolecularData,
 )
 
 
@@ -64,7 +66,7 @@ def seed_database() -> SeedStats:
     patient_2 = "SEED-PAT-002"
     tumor_1 = "SEED-TUMOR-001"
 
-    liquid_biopsy_id = UUID("10000000-0000-0000-0000-000000000001")
+    sample_id = UUID("10000000-0000-0000-0000-000000000001")
     biomodel_id = UUID("20000000-0000-0000-0000-000000000001")
     passage_id = UUID("30000000-0000-0000-0000-000000000001")
     trial_pdx_id = UUID("40000000-0000-0000-0000-000000000001")
@@ -128,10 +130,10 @@ def seed_database() -> SeedStats:
         )
         _upsert(
             session,
-            LiquidBiopsy,
-            liquid_biopsy_id,
+            Sample,
+            sample_id,
             {
-                "id": liquid_biopsy_id,
+                "id": sample_id,
                 "has_serum": True,
                 "has_buffy": True,
                 "has_plasma": True,
@@ -147,13 +149,13 @@ def seed_database() -> SeedStats:
             {
                 "id": biomodel_id,
                 "type": "PDX",
-                "preclinical_trials": "Pilot oncology panel",
                 "description": "Primary xenograft line",
                 "creation_date": date(2024, 2, 10),
                 "status": "Active",
                 "progresses": True,
                 "viability": 92.4,
                 "tumor_biobank_code": tumor_1,
+                "parent_trial_id": None,
             },
             stats,
         )
@@ -164,11 +166,9 @@ def seed_database() -> SeedStats:
             {
                 "id": passage_id,
                 "number": 1,
-                "status": "Expanded",
-                "s_index": 0.87,
-                "viability": 89.1,
                 "description": "Initial expansion passage",
                 "biomodel_id": biomodel_id,
+                "parent_trial_id": None,
             },
             stats,
         )
@@ -180,6 +180,8 @@ def seed_database() -> SeedStats:
             {
                 "id": trial_pdx_id,
                 "success": True,
+                "status": True,
+                "preclinical_trials": "Pilot oncology panel",
                 "description": "PDX efficacy baseline",
                 "creation_date": date(2024, 3, 5),
                 "biobank_shipment": True,
@@ -228,9 +230,9 @@ def seed_database() -> SeedStats:
                 "ffpe": True,
                 "he_slide": True,
                 "ihq_data": "Ki67 and p53 available",
-                "latency_weeks": 6,
-                "s_index": 1.02,
-                "scanner_magnification": "20x",
+                "has_ihq_data": True,
+                "latency_weeks": 6.5,
+                "similarity": 85.0,
             },
             stats,
         )
@@ -244,7 +246,6 @@ def seed_database() -> SeedStats:
                 "frozen_organoid_count": 40,
                 "organoid_count": 126,
                 "plate_type": "96-well",
-                "visualization_day": 14,
                 "assessment": "Good morphology",
             },
             stats,
@@ -258,7 +259,6 @@ def seed_database() -> SeedStats:
                 "confluence": 73.5,
                 "spheroids": False,
                 "digestion_date": date(2024, 4, 2),
-                "cell_line": "TC-LC-01",
                 "plate_type": "24-well",
             },
             stats,
@@ -272,20 +272,18 @@ def seed_database() -> SeedStats:
                 "id": implant_id,
                 "implant_location": "Flank",
                 "type": "Subcutaneous",
-                "size_limit": 1500.0,
-                "pdx_trial_id": trial_pdx_id,
+                "mouse_id": mouse_id,
             },
             stats,
         )
         _upsert(
             session,
-            SizeRecord,
+            Measure,
             size_record_id,
             {
                 "id": size_record_id,
-                "week_number": 3,
-                "initial_size_mm3": 120.0,
-                "final_size_mm3": 365.0,
+                "measure_date": date(2024, 4, 5),
+                "measure_value": 365.0,
                 "implant_id": implant_id,
             },
             stats,
@@ -313,6 +311,8 @@ def seed_database() -> SeedStats:
             facs_id,
             {
                 "id": facs_id,
+                "measure": "FITC",
+                "measure_value": 4.5,
                 "lc_trial_id": trial_lc_id,
             },
             stats,
@@ -324,7 +324,7 @@ def seed_database() -> SeedStats:
             usage_pdx_id,
             {
                 "id": usage_pdx_id,
-                "usage_type": "Drug treatment",
+                "record_type": "Drug treatment",
                 "description": "Cohort A dosing",
                 "record_date": date(2024, 4, 10),
                 "trial_id": trial_pdx_id,
@@ -337,7 +337,7 @@ def seed_database() -> SeedStats:
             usage_pdo_id,
             {
                 "id": usage_pdo_id,
-                "usage_type": "Organoid assay",
+                "record_type": "Organoid assay",
                 "description": "Growth curve acquisition",
                 "record_date": date(2024, 4, 15),
                 "trial_id": trial_pdo_id,
@@ -350,7 +350,7 @@ def seed_database() -> SeedStats:
             usage_lc_id,
             {
                 "id": usage_lc_id,
-                "usage_type": "Media optimization",
+                "record_type": "Media optimization",
                 "description": "Serum concentration test",
                 "record_date": date(2024, 4, 18),
                 "trial_id": trial_lc_id,
@@ -364,8 +364,9 @@ def seed_database() -> SeedStats:
             {
                 "id": image_id,
                 "image_date": date(2024, 4, 11),
+                "scanner_magnification": 20,
                 "type": "Histology",
-                "ap_review": "No necrosis observed",
+                "ap_review": True,
                 "trial_id": trial_pdx_id,
             },
             stats,
@@ -385,21 +386,51 @@ def seed_database() -> SeedStats:
         )
         _upsert(
             session,
-            GenomicSequencing,
+            TrialGenomicSequencing,
             genomic_id,
             {
                 "id": genomic_id,
+                "annotations": "Some annotations",
                 "trial_id": trial_pdx_id,
             },
             stats,
         )
         _upsert(
             session,
-            MolecularData,
+            TrialMolecularData,
             molecular_id,
             {
                 "id": molecular_id,
+                "annotations": "Some annotations",
                 "trial_id": trial_lc_id,
+            },
+            stats,
+        )
+        
+        tumor_genomic_id = UUID("60000000-0000-0000-0000-000000000008")
+        tumor_molecular_id = UUID("60000000-0000-0000-0000-000000000009")
+        
+        _upsert(
+            session,
+            TumorGenomicSequencing,
+            tumor_genomic_id,
+            {
+                "id": tumor_genomic_id,
+                "has_data": True,
+                "data": "Sample data",
+                "tumor_biobank_code": tumor_1,
+            },
+            stats,
+        )
+        _upsert(
+            session,
+            TumorMolecularData,
+            tumor_molecular_id,
+            {
+                "id": tumor_molecular_id,
+                "has_data": True,
+                "data": "Sample data",
+                "tumor_biobank_code": tumor_1,
             },
             stats,
         )

@@ -11,3 +11,17 @@ export interface Tumor {
   operation_date: string | null;
   patient_nhc: string;
 }
+
+export interface TumorGenomicSequencing {
+  id: string;
+  has_data: boolean | null;
+  data: string | null;
+  tumor_biobank_code: string | null;
+}
+
+export interface TumorMolecularData {
+  id: string;
+  has_data: boolean | null;
+  data: string | null;
+  tumor_biobank_code: string | null;
+}

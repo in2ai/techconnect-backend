@@ -1,4 +1,4 @@
-export interface LiquidBiopsy {
+export interface Sample {
   id: string;
   has_serum: boolean | null;
   has_buffy: boolean | null;

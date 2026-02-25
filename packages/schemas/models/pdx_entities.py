@@ -1,4 +1,4 @@
-"""PDX-related entities - Implant, SizeRecord, and Mouse."""
+"""PDX-related entities - Implant, Measure, and Mouse."""
 
 from datetime import date
 from typing import TYPE_CHECKING, Optional, Union
@@ -18,8 +18,8 @@ class Implant(SQLModel, table=True):
         id: Unique identifier (UUID)
         implant_location: Location of the implant
         type: Type of implant
-        size_limit: Size limit in mm³
-        pdx_trial_id: FK to PDXTrial
+        type: Type of implant
+        mouse_id: FK to Mouse
     """
     
     __tablename__ = "implant"
@@ -30,43 +30,37 @@ class Implant(SQLModel, table=True):
     # Fields
     implant_location: Optional[str] = Field(default=None, max_length=100)
     type: Optional[str] = Field(default=None, max_length=50)
-    size_limit: Optional[float] = Field(default=None)
-    
-    # Foreign keys (required - 1:N relationship with PDXTrial)
-    pdx_trial_id: UUID = Field(foreign_key="pdx_trial.id", description="FK to PDXTrial")
+    # Foreign keys (required - 1:N relationship with Mouse)
+    mouse_id: UUID = Field(foreign_key="mouse.id", description="FK to Mouse")
     
     # Relationships
-    pdx_trial: Optional["PDXTrial"] = Relationship(back_populates="implants")
-    size_records: list["SizeRecord"] = Relationship(back_populates="implant")
+    mouse: Optional["Mouse"] = Relationship(back_populates="implants")
+    measures: list["Measure"] = Relationship(back_populates="implant")
 
 
-class SizeRecord(SQLModel, table=True):
+class Measure(SQLModel, table=True):
     """
-    SizeRecord entity - records size measurements for an implant over time.
+    Measure entity - records size measurements for an implant over time.
     
     Attributes:
         id: Unique identifier (UUID)
-        week_number: Week number of the measurement
-        initial_size_mm3: Initial size in mm³
-        final_size_mm3: Final size in mm³
+        measure_date: Date of measurement
+        measure_value: Size Value
         implant_id: FK to Implant
     """
     
-    __tablename__ = "size_record"
+    __tablename__ = "measure"
     
     # Primary key
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     
-    # Fields
-    week_number: Optional[int] = Field(default=None)
-    initial_size_mm3: Optional[float] = Field(default=None)
-    final_size_mm3: Optional[float] = Field(default=None)
+    measure_date: Union[date, None] = Field(default=None)
+    measure_value: Optional[float] = Field(default=None)
     
     # Foreign keys (required - 1:N relationship with Implant)
     implant_id: UUID = Field(foreign_key="implant.id", description="FK to Implant")
     
-    # Relationships
-    implant: Optional["Implant"] = Relationship(back_populates="size_records")
+    implant: Optional["Implant"] = Relationship(back_populates="measures")
 
 
 class Mouse(SQLModel, table=True):
@@ -104,3 +98,4 @@ class Mouse(SQLModel, table=True):
     
     # Relationships
     pdx_trial: Optional["PDXTrial"] = Relationship(back_populates="mouse")
+    implants: list["Implant"] = Relationship(back_populates="mouse")

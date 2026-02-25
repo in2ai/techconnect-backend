@@ -16,14 +16,27 @@ export interface BiomodelFormData {
 @Component({
   selector: 'app-biomodel-form',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MatDialogModule, MatButtonModule, MatInputModule, MatFormFieldModule, MatSelectModule, MatCheckboxModule, FormsModule],
+  imports: [
+    MatDialogModule,
+    MatButtonModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatCheckboxModule,
+    FormsModule,
+  ],
   template: `
     <h2 mat-dialog-title>{{ data.mode === 'create' ? 'New Biomodel' : 'Edit Biomodel' }}</h2>
     <mat-dialog-content>
       <form class="form-grid">
         <mat-form-field appearance="outline">
           <mat-label>Tumor Biobank Code</mat-label>
-          <input matInput [(ngModel)]="model.tumor_biobank_code" name="tumor_biobank_code" required />
+          <input
+            matInput
+            [(ngModel)]="model.tumor_biobank_code"
+            name="tumor_biobank_code"
+            required
+          />
         </mat-form-field>
         <mat-form-field appearance="outline">
           <mat-label>Type</mat-label>
@@ -35,12 +48,15 @@ export interface BiomodelFormData {
         </mat-form-field>
         <mat-form-field appearance="outline">
           <mat-label>Viability</mat-label>
-          <input matInput [(ngModel)]="model.viability" name="viability" type="number" step="0.01" />
+          <input
+            matInput
+            [(ngModel)]="model.viability"
+            name="viability"
+            type="number"
+            step="0.01"
+          />
         </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Preclinical Trials</mat-label>
-          <input matInput [(ngModel)]="model.preclinical_trials" name="preclinical_trials" />
-        </mat-form-field>
+
         <mat-form-field appearance="outline">
           <mat-label>Creation Date</mat-label>
           <input matInput [(ngModel)]="model.creation_date" name="creation_date" type="date" />
@@ -60,8 +76,15 @@ export interface BiomodelFormData {
     </mat-dialog-actions>
   `,
   styles: `
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; min-width: 400px; }
-    .full-width { grid-column: 1 / -1; }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      min-width: 400px;
+    }
+    .full-width {
+      grid-column: 1 / -1;
+    }
   `,
 })
 export class BiomodelFormComponent {
@@ -69,5 +92,15 @@ export class BiomodelFormComponent {
 
   model: Biomodel = this.data.biomodel
     ? { ...this.data.biomodel }
-    : { id: '', type: null, preclinical_trials: null, description: null, creation_date: null, status: null, progresses: null, viability: null, tumor_biobank_code: '' };
+    : {
+        id: '',
+        type: null,
+        description: null,
+        creation_date: null,
+        status: null,
+        progresses: null,
+        viability: null,
+        tumor_biobank_code: '',
+        parent_trial_id: null,
+      };
 }

@@ -5,10 +5,12 @@ from typing import TYPE_CHECKING, Optional, Union
 from uuid import UUID, uuid4
 
 from sqlmodel import Field, Relationship, SQLModel
+from sqlalchemy import ForeignKey
 
 if TYPE_CHECKING:
     from .tumor import Tumor
     from .passage import Passage
+    from .trial import Trial
 
 
 class Biomodel(SQLModel, table=True):
@@ -18,7 +20,6 @@ class Biomodel(SQLModel, table=True):
     Attributes:
         id: Unique identifier (UUID)
         type: Type of biomodel (PDX, PDO, LC, etc.)
-        preclinical_trials: Information about preclinical trials
         description: General description
         creation_date: Date the biomodel was created
         status: Current status
@@ -34,7 +35,6 @@ class Biomodel(SQLModel, table=True):
     
     # Fields
     type: Optional[str] = Field(default=None, max_length=50)
-    preclinical_trials: Optional[str] = Field(default=None)  # text field
     description: Optional[str] = Field(default=None)  # text field
     creation_date: Union[date, None] = Field(default=None)
     status: Optional[str] = Field(default=None, max_length=50)
@@ -47,6 +47,13 @@ class Biomodel(SQLModel, table=True):
         description="FK to Tumor"
     )
     
+    parent_trial_id: Optional[UUID] = Field(
+        default=None,
+        sa_column_args=[ForeignKey("trial.id", name="fk_biomodel_parent_trial_id", use_alter=True)],
+        description="FK to parent Trial"
+    )
+    
     # Relationships
     tumor: Optional["Tumor"] = Relationship(back_populates="biomodels")
     passages: list["Passage"] = Relationship(back_populates="biomodel")
+    parent_trial: Optional["Trial"] = Relationship(back_populates="child_biomodels")
